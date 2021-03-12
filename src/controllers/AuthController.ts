@@ -16,7 +16,7 @@ class AuthController {
   async execute(req: Request, res: Response) {
     const { authorization } = req.headers;
 
-    const schema = yup.string();
+    const schema = yup.string().required();
 
     try {
       schema.validate(req.headers.authorization);

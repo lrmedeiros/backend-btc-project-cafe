@@ -71,7 +71,7 @@ var AuthController = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         authorization = req.headers.authorization;
-                        schema = yup.string();
+                        schema = yup.string().required();
                         try {
                             schema.validate(req.headers.authorization);
                         }
