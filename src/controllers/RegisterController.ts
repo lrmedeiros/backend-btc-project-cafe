@@ -32,7 +32,6 @@ class RegisterController {
     const db = await connectionToDatabase(process.env.MONGODB_URI);
 
     const collection = db.collection('users');
-    console.log(userData);
 
     const nicknameAlreadyExists = await collection.findOne({
       email: userData.email,

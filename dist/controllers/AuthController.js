@@ -46,13 +46,12 @@ var AuthController = /** @class */ (function () {
     }
     AuthController.prototype.execute = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var authorization, _a, token, decoded, db, collection, user, err_1;
+            var authorization, _a, token, decoded, db, collection, user, userReturn, err_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         authorization = req.headers.authorization;
                         _a = authorization.split(' '), token = _a[1];
-                        console.log(token);
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 4, , 5]);
@@ -61,11 +60,14 @@ var AuthController = /** @class */ (function () {
                     case 2:
                         db = _b.sent();
                         collection = db.collection('users');
-                        console.log(decoded.id);
-                        return [4 /*yield*/, collection.findOne({ _id: new bson_1.ObjectId(decoded.id) })];
+                        return [4 /*yield*/, collection.findOne({ _id: new bson_1.ObjectId(decoded._id) })];
                     case 3:
                         user = _b.sent();
-                        return [2 /*return*/, res.status(200).json({ user: user })];
+                        userReturn = {
+                            nickname: user.nickname,
+                            email: user.email,
+                        };
+                        return [2 /*return*/, res.status(200).json({ userReturn: userReturn })];
                     case 4:
                         err_1 = _b.sent();
                         throw new AppError_1.AppError(err_1);

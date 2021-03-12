@@ -5,7 +5,7 @@ import { connectionToDatabase } from '../database';
 import { AppError } from '../errors/AppError';
 
 interface decodedData {
-  id: string;
+  _id: string;
   iat: number;
   exp: number;
 }
@@ -16,8 +16,6 @@ class AuthController {
 
     const [, token] = authorization.split(' ');
 
-    console.log(token);
-
     try {
       const decoded = verify(token, process.env.SECRET) as decodedData;
 
@@ -25,11 +23,14 @@ class AuthController {
 
       const collection = db.collection('users');
 
-      console.log(decoded.id);
+      const user = await collection.findOne({ _id: new ObjectId(decoded._id) });
 
-      const user = await collection.findOne({ _id: new ObjectId(decoded.id) });
+      const userReturn = {
+        nickname: user.nickname,
+        email: user.email,
+      };
 
-      return res.status(200).json({ user });
+      return res.status(200).json({ userReturn });
     } catch (err) {
       throw new AppError(err);
     }

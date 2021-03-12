@@ -50,7 +50,6 @@ function connectionToDatabase(uri) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    console.log(uri);
                     return [4 /*yield*/, mongodb_1.MongoClient.connect(uri, {
                             useNewUrlParser: true,
                             useUnifiedTopology: true,
@@ -58,12 +57,10 @@ function connectionToDatabase(uri) {
                 case 1:
                     client = _a.sent();
                     dbName = url_1.default.parse(uri).pathname.substr(1);
-                    console.log(dbName);
                     db = client.db(dbName);
                     return [2 /*return*/, db];
                 case 2:
                     err_1 = _a.sent();
-                    console.log(err_1);
                     throw new AppError_1.AppError(err_1);
                 case 3: return [2 /*return*/];
             }

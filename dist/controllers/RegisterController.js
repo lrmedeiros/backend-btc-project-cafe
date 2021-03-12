@@ -101,7 +101,6 @@ var RegisterController = /** @class */ (function () {
                     case 6:
                         db = _c.sent();
                         collection = db.collection('users');
-                        console.log(userData);
                         return [4 /*yield*/, collection.findOne({
                                 email: userData.email,
                             })];
