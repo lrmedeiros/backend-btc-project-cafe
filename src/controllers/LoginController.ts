@@ -21,8 +21,6 @@ class LoginController {
       throw new AppError(err);
     }
 
-    const saltRounds = 10;
-
     const UserData = {
       nickname,
       password,
