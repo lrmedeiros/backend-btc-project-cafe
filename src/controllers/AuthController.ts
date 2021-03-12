@@ -1,6 +1,8 @@
 import { ObjectId } from 'bson';
 import { Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
+import * as yup from 'yup';
+
 import { connectionToDatabase } from '../database';
 import { AppError } from '../errors/AppError';
 
@@ -13,6 +15,14 @@ interface decodedData {
 class AuthController {
   async execute(req: Request, res: Response) {
     const { authorization } = req.headers;
+
+    const schema = yup.string();
+
+    try {
+      schema.validate(req.headers.authorization);
+    } catch (err) {
+      throw new AppError(err);
+    }
 
     const [, token] = authorization.split(' ');
 
