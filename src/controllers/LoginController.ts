@@ -41,7 +41,7 @@ class LoginController {
 
     if (login) {
       const token = sign({ _id: user._id }, process.env.SECRET, {
-        expiresIn: 100000, // expires in 5min
+        expiresIn: 300, // expires in 5min
       });
 
       return res

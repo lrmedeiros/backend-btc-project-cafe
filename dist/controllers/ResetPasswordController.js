@@ -55,64 +55,65 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginController = void 0;
+exports.ResetPasswordController = void 0;
 var bcrypt_1 = require("bcrypt");
-var jsonwebtoken_1 = require("jsonwebtoken");
 var yup = __importStar(require("yup"));
 var database_1 = require("../database");
 var AppError_1 = require("../errors/AppError");
-var LoginController = /** @class */ (function () {
-    function LoginController() {
+var ResetPasswordController = /** @class */ (function () {
+    function ResetPasswordController() {
     }
-    LoginController.prototype.execute = function (req, res) {
+    ResetPasswordController.prototype.execute = function (request, response) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, nickname, password, schema, UserData, db, collection, user, login, passwordDb, token;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var _a, email, newPassword, token, schema, db, collection, user, now, saltRounds, _b, _c, _d;
+            var _e, _f;
+            return __generator(this, function (_g) {
+                switch (_g.label) {
                     case 0:
-                        _a = req.body, nickname = _a.nickname, password = _a.password;
+                        _a = request.body, email = _a.email, newPassword = _a.newPassword, token = _a.token;
                         schema = yup.object().shape({
-                            nickname: yup.string().required(),
-                            password: yup.string().required(),
+                            email: yup.string().email().required(),
+                            newPassword: yup.string().required(),
+                            token: yup.string().required(),
                         });
                         try {
-                            schema.validate(req.body, { abortEarly: false });
+                            schema.validate(request.body, { abortEarly: false });
                         }
                         catch (err) {
                             throw new AppError_1.AppError(err);
                         }
-                        UserData = {
-                            nickname: nickname,
-                            password: password,
-                        };
                         return [4 /*yield*/, database_1.connectionToDatabase(process.env.MONGODB_URI)];
                     case 1:
-                        db = _b.sent();
+                        db = _g.sent();
                         collection = db.collection('users');
-                        return [4 /*yield*/, collection.findOne({ nickname: nickname })];
+                        return [4 /*yield*/, collection.findOne({ email: email })];
                     case 2:
-                        user = _b.sent();
-                        if (!user) return [3 /*break*/, 4];
-                        passwordDb = user.password;
-                        return [4 /*yield*/, bcrypt_1.compare(UserData.password, passwordDb)];
-                    case 3:
-                        login = _b.sent();
-                        _b.label = 4;
+                        user = _g.sent();
+                        if (!user)
+                            return [2 /*return*/, response.status(400).json({ message: 'User does not exist!' })];
+                        if (user.passwordResetToken !== token)
+                            return [2 /*return*/, response.status(400).json({ message: 'Invalid token!' })];
+                        now = new Date();
+                        if (now > user.passwordResetExpires)
+                            return [2 /*return*/, response.status(400).json({ message: 'link has expired!' })];
+                        saltRounds = 10;
+                        _c = (_b = collection).findOneAndUpdate;
+                        _d = [{ _id: user._id }];
+                        _e = {};
+                        _f = {};
+                        return [4 /*yield*/, bcrypt_1.hash(newPassword, saltRounds)];
+                    case 3: return [4 /*yield*/, _c.apply(_b, _d.concat([(_e.$set = (_f.password = _g.sent(),
+                                _f),
+                                _e)]))];
                     case 4:
-                        if (login) {
-                            token = jsonwebtoken_1.sign({ _id: user._id }, process.env.SECRET, {
-                                expiresIn: 300, // expires in 5min
-                            });
-                            return [2 /*return*/, res
-                                    .status(200)
-                                    .json({ message: 'Login sucess!', token: token })
-                                    .redirect('/tabs')];
-                        }
-                        return [2 /*return*/, res.status(400).json({ message: 'Login fail!', UserData: UserData })];
+                        _g.sent();
+                        return [2 /*return*/, response
+                                .status(200)
+                                .json({ message: 'The new password has been correctly established!' })];
                 }
             });
         });
     };
-    return LoginController;
+    return ResetPasswordController;
 }());
-exports.LoginController = LoginController;
+exports.ResetPasswordController = ResetPasswordController;

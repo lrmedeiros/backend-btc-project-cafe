@@ -54,65 +54,73 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginController = void 0;
-var bcrypt_1 = require("bcrypt");
-var jsonwebtoken_1 = require("jsonwebtoken");
+exports.SendMailController = void 0;
 var yup = __importStar(require("yup"));
+var path_1 = require("path");
+var crypto_1 = require("crypto");
 var database_1 = require("../database");
 var AppError_1 = require("../errors/AppError");
-var LoginController = /** @class */ (function () {
-    function LoginController() {
+var sendMailService_1 = __importDefault(require("../services/sendMailService"));
+var SendMailController = /** @class */ (function () {
+    function SendMailController() {
     }
-    LoginController.prototype.execute = function (req, res) {
+    SendMailController.prototype.execute = function (request, response) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, nickname, password, schema, UserData, db, collection, user, login, passwordDb, token;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var email, schema, db, collection, user, npsPath, token, now, variables, infoMessageSend;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _a = req.body, nickname = _a.nickname, password = _a.password;
+                        email = request.body.email;
                         schema = yup.object().shape({
-                            nickname: yup.string().required(),
-                            password: yup.string().required(),
+                            email: yup.string().email().required(),
                         });
                         try {
-                            schema.validate(req.body, { abortEarly: false });
+                            schema.validate(request.body);
                         }
                         catch (err) {
                             throw new AppError_1.AppError(err);
                         }
-                        UserData = {
-                            nickname: nickname,
-                            password: password,
-                        };
                         return [4 /*yield*/, database_1.connectionToDatabase(process.env.MONGODB_URI)];
                     case 1:
-                        db = _b.sent();
+                        db = _a.sent();
                         collection = db.collection('users');
-                        return [4 /*yield*/, collection.findOne({ nickname: nickname })];
+                        return [4 /*yield*/, collection.findOne({ email: email })];
                     case 2:
-                        user = _b.sent();
-                        if (!user) return [3 /*break*/, 4];
-                        passwordDb = user.password;
-                        return [4 /*yield*/, bcrypt_1.compare(UserData.password, passwordDb)];
+                        user = _a.sent();
+                        if (!user)
+                            return [2 /*return*/, response.status(400).json({ message: 'Email not exists!' })];
+                        npsPath = path_1.resolve(__dirname, '..', 'views', 'emails', 'templateMailForgotPassword.hbs');
+                        token = crypto_1.randomBytes(20).toString('hex');
+                        now = new Date();
+                        now.setHours(now.getHours() + 3);
+                        return [4 /*yield*/, collection.findOneAndUpdate({ _id: user._id }, {
+                                $set: {
+                                    passwordResetToken: token,
+                                    passwordResetExpires: now,
+                                },
+                            })];
                     case 3:
-                        login = _b.sent();
-                        _b.label = 4;
+                        _a.sent();
+                        variables = {
+                            token: token,
+                            link: process.env.URL_RESET_PASSWORD,
+                        };
+                        return [4 /*yield*/, sendMailService_1.default.execute(email, 'Noreply', variables, npsPath)];
                     case 4:
-                        if (login) {
-                            token = jsonwebtoken_1.sign({ _id: user._id }, process.env.SECRET, {
-                                expiresIn: 300, // expires in 5min
-                            });
-                            return [2 /*return*/, res
-                                    .status(200)
-                                    .json({ message: 'Login sucess!', token: token })
-                                    .redirect('/tabs')];
-                        }
-                        return [2 /*return*/, res.status(400).json({ message: 'Login fail!', UserData: UserData })];
+                        infoMessageSend = _a.sent();
+                        if (!infoMessageSend)
+                            return [2 /*return*/, response
+                                    .status(400)
+                                    .json({ message: 'It was not possible to send the email' })];
+                        return [2 /*return*/, response.json({ message: 'Email enviado com sucesso!' })];
                 }
             });
         });
     };
-    return LoginController;
+    return SendMailController;
 }());
-exports.LoginController = LoginController;
+exports.SendMailController = SendMailController;
