@@ -54,12 +54,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterController = void 0;
 var database_1 = require("../database");
 var yup = __importStar(require("yup"));
 var bcrypt_1 = require("bcrypt");
 var AppError_1 = require("../errors/AppError");
+var errorMessages_1 = __importDefault(require("../const/errorMessages"));
+var sucessMessages_1 = __importDefault(require("../const/sucessMessages"));
 var RegisterController = /** @class */ (function () {
     function RegisterController() {
     }
@@ -107,13 +112,15 @@ var RegisterController = /** @class */ (function () {
                     case 7:
                         nicknameAlreadyExists = _c.sent();
                         if (nicknameAlreadyExists) {
-                            return [2 /*return*/, res.status(400).json({ error: 'User already exists' })];
+                            return [2 /*return*/, res
+                                    .status(400)
+                                    .json({ message: errorMessages_1.default.EMAIL_ALREADY_EXISTS })];
                         }
                         return [4 /*yield*/, collection.insertOne(userData)];
                     case 8:
                         _c.sent();
                         return [2 /*return*/, res.status(201).json({
-                                message: 'user created successfully!',
+                                message: sucessMessages_1.default.USER_CREATED,
                                 userData: userData,
                             })];
                 }

@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import * as yup from 'yup';
 import { resolve } from 'path';
-import { randomBytes } from 'crypto';
+import { v4 as uuid } from 'uuid';
 
 import { connectionToDatabase } from '../database';
 import { AppError } from '../errors/AppError';
 import sendMailService from '../services/sendMailService';
+import errorMessages from '../const/errorMessages';
+import sucessMessages from '../const/sucessMessages';
 
 class SendMailController {
   async execute(request: Request, response: Response) {
@@ -28,7 +30,7 @@ class SendMailController {
     const user = await collection.findOne({ email });
 
     if (!user)
-      return response.status(400).json({ message: 'Email not exists!' });
+      return response.status(200).json({ message: sucessMessages.SEND_MAIL });
 
     const npsPath = resolve(
       __dirname,
@@ -38,7 +40,7 @@ class SendMailController {
       'templateMailForgotPassword.hbs'
     );
 
-    const token = randomBytes(20).toString('hex');
+    const token = uuid();
 
     const now = new Date();
     now.setHours(now.getHours() + 3);
@@ -68,10 +70,10 @@ class SendMailController {
 
     if (!infoMessageSend)
       return response
-        .status(400)
-        .json({ message: 'It was not possible to send the email' });
+        .status(500)
+        .json({ message: errorMessages.ERROR_SEND_MAIL });
 
-    return response.json({ message: 'Email enviado com sucesso!' });
+    return response.json({ message: sucessMessages.SEND_MAIL });
   }
 }
 

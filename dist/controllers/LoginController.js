@@ -54,11 +54,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginController = void 0;
 var bcrypt_1 = require("bcrypt");
 var jsonwebtoken_1 = require("jsonwebtoken");
 var yup = __importStar(require("yup"));
+var errorMessages_1 = __importDefault(require("../const/errorMessages"));
+var sucessMessages_1 = __importDefault(require("../const/sucessMessages"));
 var database_1 = require("../database");
 var AppError_1 = require("../errors/AppError");
 var LoginController = /** @class */ (function () {
@@ -99,16 +104,14 @@ var LoginController = /** @class */ (function () {
                         login = _b.sent();
                         _b.label = 4;
                     case 4:
-                        if (login) {
-                            token = jsonwebtoken_1.sign({ _id: user._id }, process.env.SECRET, {
-                                expiresIn: 300, // expires in 5min
-                            });
-                            return [2 /*return*/, res
-                                    .status(200)
-                                    .json({ message: 'Login sucess!', token: token })
-                                    .redirect('/tabs')];
-                        }
-                        return [2 /*return*/, res.status(400).json({ message: 'Login fail!', UserData: UserData })];
+                        if (!login)
+                            return [2 /*return*/, res.status(400).json({ message: errorMessages_1.default.LOGIN_FAIL })];
+                        token = jsonwebtoken_1.sign({ _id: user._id }, process.env.SECRET, {
+                            expiresIn: 300, // expires in 5min
+                        });
+                        return [2 /*return*/, res
+                                .status(200)
+                                .json({ message: sucessMessages_1.default.LOGIN_SUCESS, token: token })];
                 }
             });
         });

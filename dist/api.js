@@ -9,6 +9,7 @@ require("express-async-errors");
 var cors_1 = __importDefault(require("cors"));
 var AppError_1 = require("./errors/AppError");
 var routes_1 = require("./routes");
+var errorMessages_1 = __importDefault(require("./const/errorMessages"));
 var app = express_1.default();
 exports.app = app;
 app.use(cors_1.default());
@@ -17,11 +18,11 @@ app.use(routes_1.router);
 app.use(function (err, request, response, _next) {
     if (err instanceof AppError_1.AppError) {
         return response.status(err.statusCode).json({
-            message: err.message,
+            ErrorMessage: err.message,
         });
     }
     return response.status(500).json({
         status: 'Error',
-        message: "Internal server error " + err.message,
+        ErrorMessage: errorMessages_1.default.INTERNAL_ERROR + " " + err.message,
     });
 });

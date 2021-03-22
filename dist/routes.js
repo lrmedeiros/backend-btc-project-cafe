@@ -18,4 +18,4 @@ router.post('/login', loginController.execute);
 router.get('/auth', authController.execute);
 router.post('/register', registerController.create);
 router.post('/forgot-password', sendMailController.execute);
-router.post('/reset-password/:token', resetPasswordController.execute);
+router.post('/reset-password', resetPasswordController.execute);

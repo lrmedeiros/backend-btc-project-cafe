@@ -54,10 +54,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPasswordController = void 0;
 var bcrypt_1 = require("bcrypt");
 var yup = __importStar(require("yup"));
+var errorMessages_1 = __importDefault(require("../const/errorMessages"));
+var sucessMessages_1 = __importDefault(require("../const/sucessMessages"));
 var database_1 = require("../database");
 var AppError_1 = require("../errors/AppError");
 var ResetPasswordController = /** @class */ (function () {
@@ -65,14 +70,13 @@ var ResetPasswordController = /** @class */ (function () {
     }
     ResetPasswordController.prototype.execute = function (request, response) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, email, newPassword, token, schema, db, collection, user, now, saltRounds, _b, _c, _d;
+            var _a, newPassword, token, schema, db, collection, user, now, saltRounds, _b, _c, _d;
             var _e, _f;
             return __generator(this, function (_g) {
                 switch (_g.label) {
                     case 0:
-                        _a = request.body, email = _a.email, newPassword = _a.newPassword, token = _a.token;
+                        _a = request.body, newPassword = _a.newPassword, token = _a.token;
                         schema = yup.object().shape({
-                            email: yup.string().email().required(),
                             newPassword: yup.string().required(),
                             token: yup.string().required(),
                         });
@@ -86,16 +90,16 @@ var ResetPasswordController = /** @class */ (function () {
                     case 1:
                         db = _g.sent();
                         collection = db.collection('users');
-                        return [4 /*yield*/, collection.findOne({ email: email })];
+                        return [4 /*yield*/, collection.findOne({ passwordResetToken: token })];
                     case 2:
                         user = _g.sent();
                         if (!user)
-                            return [2 /*return*/, response.status(400).json({ message: 'User does not exist!' })];
-                        if (user.passwordResetToken !== token)
-                            return [2 /*return*/, response.status(400).json({ message: 'Invalid token!' })];
+                            return [2 /*return*/, response
+                                    .status(400)
+                                    .json({ message: errorMessages_1.default.INVALID_TOKEN })];
                         now = new Date();
                         if (now > user.passwordResetExpires)
-                            return [2 /*return*/, response.status(400).json({ message: 'link has expired!' })];
+                            return [2 /*return*/, response.status(400).json({ message: errorMessages_1.default.LINK_EXPIRED })];
                         saltRounds = 10;
                         _c = (_b = collection).findOneAndUpdate;
                         _d = [{ _id: user._id }];
@@ -109,7 +113,7 @@ var ResetPasswordController = /** @class */ (function () {
                         _g.sent();
                         return [2 /*return*/, response
                                 .status(200)
-                                .json({ message: 'The new password has been correctly established!' })];
+                                .json({ message: sucessMessages_1.default.PASSWORD_CHANGE })];
                 }
             });
         });

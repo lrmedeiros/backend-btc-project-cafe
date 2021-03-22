@@ -1,16 +1,17 @@
 import { hash } from 'bcrypt';
 import { Request, Response } from 'express';
 import * as yup from 'yup';
+import errorMessages from '../const/errorMessages';
+import sucessMessages from '../const/sucessMessages';
 
 import { connectionToDatabase } from '../database';
 import { AppError } from '../errors/AppError';
 
 class ResetPasswordController {
   async execute(request: Request, response: Response) {
-    const { email, newPassword, token } = request.body;
+    const { newPassword, token } = request.body;
 
     const schema = yup.object().shape({
-      email: yup.string().email().required(),
       newPassword: yup.string().required(),
       token: yup.string().required(),
     });
@@ -25,18 +26,17 @@ class ResetPasswordController {
 
     const collection = db.collection('users');
 
-    const user = await collection.findOne({ email });
+    const user = await collection.findOne({ passwordResetToken: token });
 
     if (!user)
-      return response.status(400).json({ message: 'User does not exist!' });
-
-    if (user.passwordResetToken !== token)
-      return response.status(400).json({ message: 'Invalid token!' });
+      return response
+        .status(400)
+        .json({ message: errorMessages.INVALID_TOKEN });
 
     const now = new Date();
 
     if (now > user.passwordResetExpires)
-      return response.status(400).json({ message: 'link has expired!' });
+      return response.status(400).json({ message: errorMessages.LINK_EXPIRED });
 
     const saltRounds = 10;
 
@@ -51,7 +51,7 @@ class ResetPasswordController {
 
     return response
       .status(200)
-      .json({ message: 'The new password has been correctly established!' });
+      .json({ message: sucessMessages.PASSWORD_CHANGE });
   }
 }
 

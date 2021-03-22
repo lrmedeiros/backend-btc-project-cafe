@@ -2,6 +2,8 @@ import { compare } from 'bcrypt';
 import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as yup from 'yup';
+import errorMessages from '../const/errorMessages';
+import sucessMessages from '../const/sucessMessages';
 
 import { connectionToDatabase } from '../database';
 import { AppError } from '../errors/AppError';
@@ -39,17 +41,16 @@ class LoginController {
       login = await compare(UserData.password, passwordDb);
     }
 
-    if (login) {
-      const token = sign({ _id: user._id }, process.env.SECRET, {
-        expiresIn: 300, // expires in 5min
-      });
+    if (!login)
+      return res.status(400).json({ message: errorMessages.LOGIN_FAIL });
 
-      return res
-        .status(200)
-        .json({ message: 'Login sucess!', token })
-        .redirect('/tabs');
-    }
-    return res.status(400).json({ message: 'Login fail!', UserData });
+    const token = sign({ _id: user._id }, process.env.SECRET, {
+      expiresIn: 300, // expires in 5min
+    });
+
+    return res
+      .status(200)
+      .json({ message: sucessMessages.LOGIN_SUCESS, token });
   }
 }
 

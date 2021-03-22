@@ -3,6 +3,8 @@ import { connectionToDatabase } from '../database';
 import * as yup from 'yup';
 import { hash } from 'bcrypt';
 import { AppError } from '../errors/AppError';
+import errorMessages from '../const/errorMessages';
+import sucessMessages from '../const/sucessMessages';
 
 class RegisterController {
   async create(req: Request, res: Response) {
@@ -38,13 +40,15 @@ class RegisterController {
     });
 
     if (nicknameAlreadyExists) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res
+        .status(400)
+        .json({ message: errorMessages.EMAIL_ALREADY_EXISTS });
     }
 
     await collection.insertOne(userData);
 
     return res.status(201).json({
-      message: 'user created successfully!',
+      message: sucessMessages.USER_CREATED,
       userData,
     });
   }

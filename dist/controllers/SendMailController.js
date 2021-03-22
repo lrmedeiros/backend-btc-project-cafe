@@ -61,10 +61,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SendMailController = void 0;
 var yup = __importStar(require("yup"));
 var path_1 = require("path");
-var crypto_1 = require("crypto");
+var uuid_1 = require("uuid");
 var database_1 = require("../database");
 var AppError_1 = require("../errors/AppError");
 var sendMailService_1 = __importDefault(require("../services/sendMailService"));
+var errorMessages_1 = __importDefault(require("../const/errorMessages"));
+var sucessMessages_1 = __importDefault(require("../const/sucessMessages"));
 var SendMailController = /** @class */ (function () {
     function SendMailController() {
     }
@@ -92,9 +94,9 @@ var SendMailController = /** @class */ (function () {
                     case 2:
                         user = _a.sent();
                         if (!user)
-                            return [2 /*return*/, response.status(400).json({ message: 'Email not exists!' })];
+                            return [2 /*return*/, response.status(200).json({ message: sucessMessages_1.default.SEND_MAIL })];
                         npsPath = path_1.resolve(__dirname, '..', 'views', 'emails', 'templateMailForgotPassword.hbs');
-                        token = crypto_1.randomBytes(20).toString('hex');
+                        token = uuid_1.v4();
                         now = new Date();
                         now.setHours(now.getHours() + 3);
                         return [4 /*yield*/, collection.findOneAndUpdate({ _id: user._id }, {
@@ -114,9 +116,9 @@ var SendMailController = /** @class */ (function () {
                         infoMessageSend = _a.sent();
                         if (!infoMessageSend)
                             return [2 /*return*/, response
-                                    .status(400)
-                                    .json({ message: 'It was not possible to send the email' })];
-                        return [2 /*return*/, response.json({ message: 'Email enviado com sucesso!' })];
+                                    .status(500)
+                                    .json({ message: errorMessages_1.default.ERROR_SEND_MAIL })];
+                        return [2 /*return*/, response.json({ message: sucessMessages_1.default.SEND_MAIL })];
                 }
             });
         });
