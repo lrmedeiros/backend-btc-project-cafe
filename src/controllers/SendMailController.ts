@@ -73,7 +73,7 @@ class SendMailController {
         .status(500)
         .json({ message: errorMessages.ERROR_SEND_MAIL });
 
-    return response.json({ message: sucessMessages.SEND_MAIL });
+    return response.json({ message: infoMessageSend });
   }
 }
 

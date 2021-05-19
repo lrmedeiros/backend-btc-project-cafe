@@ -118,7 +118,7 @@ var SendMailController = /** @class */ (function () {
                             return [2 /*return*/, response
                                     .status(500)
                                     .json({ message: errorMessages_1.default.ERROR_SEND_MAIL })];
-                        return [2 /*return*/, response.json({ message: sucessMessages_1.default.SEND_MAIL })];
+                        return [2 /*return*/, response.json({ message: infoMessageSend })];
                 }
             });
         });

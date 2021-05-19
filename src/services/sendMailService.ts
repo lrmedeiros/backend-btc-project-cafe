@@ -10,19 +10,33 @@ interface variablesData {
 class SendMailService {
   private transport: Transporter;
   constructor() {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
+    //   const transporter = nodemailer.createTransport({
+    //     host: 'smtp.gmail.com',
+    //     port: 587,
+    //     secure: false,
+    //     auth: {
+    //       user: process.env.MAIL_USER,
+    //       pass: process.env.MAIL_PASSWORD,
+    //     },
+    //     tls: {
+    //       rejectUnauthorized: false,
+    //     },
+    //   });
+    //   this.transport = transporter;
+    // }
+    nodemailer.createTestAccount().then((account) => {
+      const transporter = nodemailer.createTransport({
+        host: account.smtp.host,
+        port: account.smtp.port,
+        secure: account.smtp.secure,
+        auth: {
+          user: account.user,
+          pass: account.pass,
+        },
+      });
+
+      this.transport = transporter;
     });
-    this.transport = transporter;
   }
 
   async execute(
@@ -44,7 +58,7 @@ class SendMailService {
       html,
     });
 
-    return message;
+    return nodemailer.getTestMessageUrl(message);
   }
 }
 

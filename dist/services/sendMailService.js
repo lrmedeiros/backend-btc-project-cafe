@@ -44,19 +44,33 @@ var handlebars_1 = __importDefault(require("handlebars"));
 var fs_1 = __importDefault(require("fs"));
 var SendMailService = /** @class */ (function () {
     function SendMailService() {
-        var transporter = nodemailer_1.default.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASSWORD,
-            },
-            tls: {
-                rejectUnauthorized: false,
-            },
+        var _this = this;
+        //   const transporter = nodemailer.createTransport({
+        //     host: 'smtp.gmail.com',
+        //     port: 587,
+        //     secure: false,
+        //     auth: {
+        //       user: process.env.MAIL_USER,
+        //       pass: process.env.MAIL_PASSWORD,
+        //     },
+        //     tls: {
+        //       rejectUnauthorized: false,
+        //     },
+        //   });
+        //   this.transport = transporter;
+        // }
+        nodemailer_1.default.createTestAccount().then(function (account) {
+            var transporter = nodemailer_1.default.createTransport({
+                host: account.smtp.host,
+                port: account.smtp.port,
+                secure: account.smtp.secure,
+                auth: {
+                    user: account.user,
+                    pass: account.pass,
+                },
+            });
+            _this.transport = transporter;
         });
-        this.transport = transporter;
     }
     SendMailService.prototype.execute = function (to, subject, variables, path) {
         return __awaiter(this, void 0, void 0, function () {
@@ -75,7 +89,7 @@ var SendMailService = /** @class */ (function () {
                             })];
                     case 1:
                         message = _a.sent();
-                        return [2 /*return*/, message];
+                        return [2 /*return*/, nodemailer_1.default.getTestMessageUrl(message)];
                 }
             });
         });
