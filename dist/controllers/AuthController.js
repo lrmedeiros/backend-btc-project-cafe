@@ -70,10 +70,10 @@ var AuthController = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        authorization = req.headers.authorization;
+                        authorization = req.body.authorization;
                         schema = yup.string().required();
                         try {
-                            schema.validate(req.headers.authorization);
+                            schema.validate(req.body.authorization);
                         }
                         catch (err) {
                             throw new AppError_1.AppError(err);
