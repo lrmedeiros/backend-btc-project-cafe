@@ -8,11 +8,11 @@ interface PayloadData {
 }
 
 export function refresh(token: string) {
-  const payload = verify(token, this.secretOrPublicKey) as PayloadData;
+  const payload = verify(token, process.env.SECRET) as PayloadData;
   delete payload.iat;
   delete payload.exp;
   delete payload.nbf;
   delete payload.jti; //We are generating a new token, if you are using jwtid during signing, pass it in refreshOptions
   // The first signing converted all needed options into claims, they are already in the payload
-  return sign(payload, this.secretOrPrivateKey);
+  return sign(payload, process.env.SECRET);
 }
