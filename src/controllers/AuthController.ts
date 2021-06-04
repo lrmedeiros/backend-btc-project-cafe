@@ -14,12 +14,12 @@ interface decodedData {
 
 class AuthController {
   async execute(req: Request, res: Response) {
-    const { authorization } = req.headers;
+    const { authorization } = req.body;
 
     const schema = yup.string().required();
 
     try {
-      schema.validate(req.headers.authorization);
+      schema.validate(req.body.authorization);
     } catch (err) {
       throw new AppError(err);
     }
