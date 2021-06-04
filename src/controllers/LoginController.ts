@@ -4,9 +4,9 @@ import { sign } from 'jsonwebtoken';
 import * as yup from 'yup';
 import errorMessages from '../const/errorMessages';
 import sucessMessages from '../const/sucessMessages';
-
 import { connectionToDatabase } from '../database';
 import { AppError } from '../errors/AppError';
+import { refresh } from '../utils/refresh';
 
 class LoginController {
   async execute(req: Request, res: Response) {
@@ -45,12 +45,19 @@ class LoginController {
       return res.status(400).json({ message: errorMessages.LOGIN_FAIL });
 
     const token = sign({ _id: user._id }, process.env.SECRET, {
-      expiresIn: 300, // expires in 5min
+      expiresIn: 60 * 60, // 1 hora
     });
 
     return res
       .status(200)
       .json({ message: sucessMessages.LOGIN_SUCESS, token });
+  }
+  async refreshToken(request: Request, response: Response) {
+    const { token } = request.body;
+
+    const newToken = refresh(token);
+
+    response.json(newToken).status(400);
   }
 }
 

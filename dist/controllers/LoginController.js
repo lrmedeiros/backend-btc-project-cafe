@@ -66,6 +66,7 @@ var errorMessages_1 = __importDefault(require("../const/errorMessages"));
 var sucessMessages_1 = __importDefault(require("../const/sucessMessages"));
 var database_1 = require("../database");
 var AppError_1 = require("../errors/AppError");
+var refresh_1 = require("../utils/refresh");
 var LoginController = /** @class */ (function () {
     function LoginController() {
     }
@@ -107,12 +108,23 @@ var LoginController = /** @class */ (function () {
                         if (!login)
                             return [2 /*return*/, res.status(400).json({ message: errorMessages_1.default.LOGIN_FAIL })];
                         token = jsonwebtoken_1.sign({ _id: user._id }, process.env.SECRET, {
-                            expiresIn: 300, // expires in 5min
+                            expiresIn: 60 * 60, // 1 hora
                         });
                         return [2 /*return*/, res
                                 .status(200)
                                 .json({ message: sucessMessages_1.default.LOGIN_SUCESS, token: token })];
                 }
+            });
+        });
+    };
+    LoginController.prototype.refreshToken = function (request, response) {
+        return __awaiter(this, void 0, void 0, function () {
+            var token, newToken;
+            return __generator(this, function (_a) {
+                token = request.body.token;
+                newToken = refresh_1.refresh(token);
+                response.json(newToken).status(400);
+                return [2 /*return*/];
             });
         });
     };

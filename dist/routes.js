@@ -16,6 +16,7 @@ var sendMailController = new SendMailController_1.SendMailController();
 var resetPasswordController = new ResetPasswordController_1.ResetPasswordController();
 router.post('/login', loginController.execute);
 router.get('/auth', authController.execute);
+router.post('/refresh-auth', loginController.refreshToken);
 router.post('/register', registerController.create);
 router.post('/forgot-password', sendMailController.execute);
 router.post('/reset-password', resetPasswordController.execute);
