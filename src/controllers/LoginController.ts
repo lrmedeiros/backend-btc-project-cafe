@@ -57,7 +57,7 @@ class LoginController {
 
     const newToken = refresh(token);
 
-    response.json(newToken).status(400);
+    return response.json(newToken).status(400);
   }
 }
 
