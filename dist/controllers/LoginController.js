@@ -123,8 +123,7 @@ var LoginController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 token = request.body.token;
                 newToken = refresh_1.refresh(token);
-                response.json(newToken).status(400);
-                return [2 /*return*/];
+                return [2 /*return*/, response.json(newToken).status(400)];
             });
         });
     };

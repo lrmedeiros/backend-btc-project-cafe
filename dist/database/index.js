@@ -43,26 +43,30 @@ exports.connectionToDatabase = void 0;
 var mongodb_1 = require("mongodb");
 var AppError_1 = require("../errors/AppError");
 var url_1 = __importDefault(require("url"));
+var db = null;
 function connectionToDatabase(uri) {
     return __awaiter(this, void 0, void 0, function () {
-        var client, dbName, db, err_1;
+        var client, dbName, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
+                    if (!db) return [3 /*break*/, 1];
+                    return [2 /*return*/, db];
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, mongodb_1.MongoClient.connect(uri, {
                             useNewUrlParser: true,
                             useUnifiedTopology: true,
                         })];
-                case 1:
+                case 2:
                     client = _a.sent();
                     dbName = url_1.default.parse(uri).pathname.substr(1);
                     db = client.db(dbName);
                     return [2 /*return*/, db];
-                case 2:
+                case 3:
                     err_1 = _a.sent();
                     throw new AppError_1.AppError(err_1);
-                case 3: return [2 /*return*/];
+                case 4: return [2 /*return*/];
             }
         });
     });
